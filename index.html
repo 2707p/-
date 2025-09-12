@@ -1,1 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>창원 성민여자고등학교 포털</title>
+<style>
+  body { font-family: Arial; padding: 20px; background: #f9f9f9; }
+  h1, h2 { color: #2c3e50; }
+  section { margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+  table { border-collapse: collapse; width: 100%; text-align: center; }
+  th, td { border: 1px solid #ccc; padding: 8px; }
+  input[type="text"], input[type="password"], input[type="number"], textarea { padding: 5px; margin: 3px; width: 200px; }
+  .btn { cursor:pointer; padding:5px 10px; margin:3px; border-radius:5px; border:none; background:#3498db; color:white; }
+  .btn:hover { background:#2980b9; }
+  .calendar { display:flex; flex-wrap: wrap; width:300px; margin-bottom:10px; }
+  .day { width:40px; height:40px; margin:2px; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:5px; }
+  .event { background-color:#f39c12; color:white; }
+  .mood-btn { margin:3px; cursor:pointer; font-size:20px;}
+  .mood-display { margin-top:5px; }
+  .pagination { margin-top:10px; text-align:center; }
+  .pagination button { margin:2px; }
+</style>
+</head>
+<body>
+
+<h1>창원 성민여자고등학교 포털</h1>
+
+<!-- 로그인 -->
+<section id="login-section">
+  <h2>로그인</h2>
+  <input id="login-id" placeholder="아이디">
+  <input id="login-pw" type="password" placeholder="비밀번호">
+  <button class="btn" onclick="login()">로그인</button>
+  <p>계정이 없나요? <button class="btn" onclick="showSignup()">회원가입</button></p>
+</section>
+
+<!-- 회원가입 -->
+<section id="signup-section" style="display:none">
+  <h2>회원가입</h2>
+  <input id="signup-id" placeholder="아이디">
+  <input id="signup-pw" type="password" placeholder="비밀번호">
+  <input id="signup-grade" type="number" placeholder="학년(1~3)">
+  <input id="signup-class" type="number" placeholder="반(1~8)">
+  <button class="btn" onclick="signup()">가입하기</button>
+  <button class="btn" onclick="hideSignup()">취소</button>
+</section>
+
+<!-- 포털 -->
+<section id="portal-section" style="display:none">
+  <button class="btn" onclick="logout()">로그아웃</button>
+
+  <section>
+    <h2>시간표</h2>
+    <div id="timetable"></div>
+  </section>
+
+  <section>
+    <h2>캘린더</h2>
+    <div>
+      <button class="btn" onclick="changeMonth(-1)">◀ 이전</button>
+      <span id="calendar-month"></span>
+      <button class="btn" onclick="changeMonth(1)">다음 ▶</button>
+    </div>
+    <div class="calendar" id="calendar"></div>
+    <div id="mood-section"></div>
+  </section>
+
+  <section>
+    <h2>셔틀버스 정보</h2>
+    <ul id="bus-list"></ul>
+  </section>
+
+  <section>
+    <h2>대나무숲 게시판</h2>
+    <button class="btn" onclick="showBambooPage()">자세히 보기</button>
+  </section>
+</section>
+
+<!-- 대나무숲 상세 -->
+<section id="bamboo-page" style="display:none">
+  <h2>대나무숲</h2>
+  <div>
+    <button class="btn" onclick="showWriteForm()">글쓰기</button>
+    <input type="text" id="bamboo-search" placeholder="제목/내용 검색">
+    <button class="btn" onclick="renderBambooDetail()">검색</button>
+  </div>
+  <div id="write-form" style="display:none;">
+    <input type="text" id="bamboo-title" placeholder="제목">
+    <textarea id="bamboo-content" placeholder="내용" rows="3" style="width:100%;"></textarea>
+    <button class="btn" onclick="postBambooDetail()">게시</button>
+    <button class="btn" onclick="hideWriteForm()">취소</button>
+  </div>
+  <table style="width:100%; margin-top:10px;">
+    <tbody id="bamboo-detail-list"></tbody>
+  </table>
+  <div class="pagination" id="bamboo-pagination"></div>
+  <button class="btn" onclick="closeBambooPage()">닫기</button>
+</section>
+
+<script>
+  // ===== 초기화 =====
+  localStorage.clear(); // 이전 기록 삭제
+  let users=[];
+  localStorage.setItem('users', JSON.stringify(users));
+
+  function showSignup(){ document.getElementById('login-section').style.display='none'; document.getElementById('signup-section').style.display='block'; }
+  function hideSignup(){ document.getElementById('signup-section').style.display='none'; document.getElementById('login-section').style.display='block'; }
+
+  function signup(){
+    let id=document.getElementById('signup-id').value.trim();
+    let pw=document.getElementById('signup-pw').value.trim();
+    let grade=parseInt(document.getElementById('signup-grade').value);
+    let cls=parseInt(document.getElementById('signup-class').value);
+    if(!id||!pw||!grade||!cls){ alert("모든 항목 입력해주세요"); return; }
+    users=JSON.parse(localStorage.getItem('users')||"[]");
+    if(users.some(u=>u.id===id)){ alert("이미 존재하는 아이디"); return; }
+    users.push({id,pw,grade,cls});
+    localStorage.setItem('users', JSON.stringify(users));
+    alert("회원가입 완료! 로그인 해주세요.");
+    hideSignup();
+  }
+
+  function login(){
+    let id=document.getElementById('login-id').value;
+    let pw=document.getElementById('login-pw').value;
+    users=JSON.parse(localStorage.getItem('users')||"[]");
+    const user=users.find(u=>u.id===id && u.pw===pw);
+    if(user){
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      document.getElementById('login-section').style.display='none';
+      document.getElementById('portal-section').style.display='block';
+      showTimetable(user);
+      renderCalendar();
+      renderBusInfo();
+    } else alert("아이디 또는 비밀번호가 틀렸습니다.");
+  }
+
+  function logout(){
+    localStorage.removeItem('currentUser');
+    location.reload();
+  }
+
+  // ===== 시간표 =====
+  const timetables={};
+  function showTimetable(user){
+    const key=`${user.grade}-${user.cls}`;
+    const tableDiv=document.getElementById('timetable');
+    tableDiv.innerHTML="";
+    const table=document.createElement('table');
+    const days=["월","화","수","목","금"];
+    const tr=document.createElement('tr');
+    tr.innerHTML="<th>교시</th>"+days.map(d=>`<th>${d}</th>`).join("");
+    table.appendChild(tr);
+    for(let i=0;i<5;i++){
+      const tr=document.createElement('tr');
+      tr.innerHTML="<td>"+(i+1)+"교시</td>"+(timetables[key] ? (timetables[key][i]||["","","","",""]).map(c=>`<td>${c}</td>`).join("") : ["","","","",""].map(c=>`<td>${c}</td>`).join(""));
+      table.appendChild(tr);
+      table.appendChild(tr);
+    }
+    tableDiv.appendChild(table);
+  }
+
+  // ===== 셔틀버스 =====
+  const buses=[{route:"A코스",status:"운행중",next:"08:30"},{route:"B코스",status:"지연",next:"08:45"}];
+  function renderBusInfo(){
+    const busList=document.getElementById('bus-list');
+    busList.innerHTML="";
+    buses.forEach(b=>{
+      const li=document.createElement('li');
+      li.textContent=`${b.route} - ${b.status} (다음:${b.next})`;
+      busList.appendChild(li);
+    });
+  }
+
+  // ===== 캘린더 + 마음온도 =====
+  let currentMonth=new Date();
+  let moods={};
+  function renderCalendar(){
+    const calendar=document.getElementById('calendar');
+    calendar.innerHTML="";
+    const year=currentMonth.getFullYear();
+    const month=currentMonth.getMonth();
+    document.getElementById('calendar-month').textContent=`${year}년 ${month+1}월`;
+    const firstDay=new Date(year,month,1).getDay();
+    const lastDate=new Date(year,month+1,0).getDate();
+    for(let i=0;i<firstDay;i++){ const div=document.createElement('div'); div.className='day'; div.style.visibility='hidden'; calendar.appendChild(div); }
+    for(let d=1;d<=lastDate;d++){
+      const div=document.createElement('div'); div.className='day'; div.textContent=d;
+      div.onclick=()=>selectMood(`${year}-${month+1}-${d}`);
+      calendar.appendChild(div);
+    }
+  }
+  function changeMonth(dir){ currentMonth.setMonth(currentMonth.getMonth()+dir); renderCalendar(); }
+  function selectMood(date){
+    const emojis=["😄","😓","😍","😢"];
+    const section=document.getElementById('mood-section');
+    section.innerHTML=`<h3>${date} 마음온도</h3>`;
+    emojis.forEach(e=>{
+      const btn=document.createElement('button'); btn.textContent=e; btn.className='mood-btn';
+      btn.onclick=()=>{ moods[date]=moods[date]||[]; moods[date].push(e); showMood(date); };
+      section.appendChild(btn);
+    });
+    showMood(date);
+  }
+  function showMood(date){
+    const section=document.getElementById('mood-section');
+    const div=document.createElement('div'); div.className='mood-display';
+    div.textContent=`선택한 이모지 수: ${(moods[date]||[]).length}개`;
+    section.appendChild(div);
+  }
+
+  // ===== 대나무숲 =====
+  let bambooPosts={};
+  let currentBambooPage=1;
+  const bambooPerPage=20;
+
+  function showBambooPage(){
+    const user=JSON.parse(localStorage.getItem('currentUser'));
+    if(!bambooPosts[user.id]) bambooPosts[user.id]=[];
+    document.getElementById('portal-section').style.display='none';
+    document.getElementById('bamboo-page').style.display='block';
+    renderBambooDetail();
+  }
+
+  function closeBambooPage(){
+    document.getElementById('bamboo-page').style.display='none';
+    document.getElementById('portal-section').style.display='block';
+  }
+
+  function showWriteForm(){ document.getElementById('write-form').style.display='block'; }
+  function hideWriteForm(){ document.getElementById('write-form').style.display='none'; }
+
+  function postBambooDetail(){
+    const title=document.getElementById('bamboo-title').value.trim();
+    const content=document.getElementById('bamboo-content').value.trim();
+    if(!title||!content){ alert("제목과 내용을 입력해주세요"); return; }
+    const user=JSON.parse(localStorage.getItem('currentUser'));
+    bambooPosts[user.id].unshift({title,content,date:new Date().toLocaleString(),views:0,comments:[],rec:0,deRec:0});
+    document.getElementById('bamboo-title').value='';
+    document.getElementById('bamboo-content').value='';
+    hideWriteForm();
+    renderBambooDetail();
+  }
+
+  function renderBambooDetail(){
+    const user=JSON.parse(localStorage.getItem('currentUser'));
+    const posts=bambooPosts[user.id]||[];
+    const search=document.getElementById('bamboo-search').value.trim().toLowerCase();
+    let filtered=posts;
+    if(search) filtered=posts.filter(p=>p.title.toLowerCase().includes(search)||p.content.toLowerCase().includes(search));
+    const totalPage=Math.ceil(filtered.length/bambooPerPage);
+    if(currentBambooPage>totalPage) currentBambooPage=1;
+    const start=(currentBambooPage-1)*bambooPerPage;
+    const pagePosts=filtered.slice(start,start+bambooPerPage);
+    const tbody=document.getElementById('bamboo-detail-list');
+    tbody.innerHTML="";
+    pagePosts.forEach((p,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td><a href="#" onclick="viewBambooPost(${start+i})">${p.title}</a></td>`;
+      tbody.appendChild(tr);
+    });
+    const pagDiv=document.getElementById('bamboo-pagination');
+    pagDiv.innerHTML="";
+    for(let i=1;i<=totalPage;i++){
+      const btn=document.createElement('button'); btn.textContent=i; btn.className='btn';
+      btn.onclick=(()=>{ return ()=>{ currentBambooPage=i; renderBambooDetail(); }})(i);
+      pagDiv.appendChild(btn);
+    }
+  }
+
+  function viewBambooPost(idx){
+    const user=JSON.parse(localStorage.getItem('currentUser'));
+    const post=bambooPosts[user.id][idx];
+    post.views+=1;
+    alert(`제목: ${post.title}\n내용: ${post.content}\n댓글: ${post.comments.length}개\n추천:${post.rec} 비추천:${post.deRec}`);
+    renderBambooDetail();
+  }
+
+</script>
+</body>
+</html>
 
