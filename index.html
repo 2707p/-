@@ -1,1 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>창원 성민여자고 포털 로그인</title>
+<style>
+body { font-family: Arial; background:#f9f9f9; padding:20px;}
+section { background:#fff; padding:20px; border-radius:8px; width:300px; margin:30px auto; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+input { width:90%; padding:5px; margin:5px 0;}
+button { padding:5px 10px; border:none; border-radius:5px; background:#3498db; color:white; cursor:pointer; margin:5px 0;}
+button:hover { background:#2980b9;}
+</style>
+</head>
+<body>
+
+<section id="login-section">
+  <h2>로그인</h2>
+  <input id="login-id" placeholder="아이디">
+  <input id="login-pw" type="password" placeholder="비밀번호">
+  <button onclick="login()">로그인</button>
+  <p>계정이 없나요? <button onclick="showSignup()">회원가입</button></p>
+</section>
+
+<section id="signup-section" style="display:none">
+  <h2>회원가입</h2>
+  <input id="signup-id" placeholder="아이디">
+  <input id="signup-pw" type="password" placeholder="비밀번호">
+  <input id="signup-grade" type="number" placeholder="학년">
+  <input id="signup-class" type="number" placeholder="반">
+  <button onclick="signup()">가입하기</button>
+  <button onclick="hideSignup()">취소</button>
+</section>
+
+<script>
+let users = JSON.parse(localStorage.getItem('users')||"[]");
+
+function showSignup(){
+  document.getElementById('login-section').style.display='none';
+  document.getElementById('signup-section').style.display='block';
+}
+function hideSignup(){
+  document.getElementById('signup-section').style.display='none';
+  document.getElementById('login-section').style.display='block';
+}
+
+function signup(){
+  let id = document.getElementById('signup-id').value.trim();
+  let pw = document.getElementById('signup-pw').value.trim();
+  let grade = parseInt(document.getElementById('signup-grade').value);
+  let cls = parseInt(document.getElementById('signup-class').value);
+  if(!id||!pw||!grade||!cls){ alert("모든 항목을 입력해주세요."); return;}
+  if(users.some(u=>u.id===id)){ alert("이미 존재하는 아이디입니다."); return;}
+  users.push({id,pw,grade,cls});
+  localStorage.setItem('users', JSON.stringify(users));
+  alert("회원가입 완료!");
+  hideSignup();
+}
+
+function login(){
+  let id = document.getElementById('login-id').value;
+  let pw = document.getElementById('login-pw').value;
+  const user = users.find(u=>u.id===id && u.pw===pw);
+  if(user){
+    alert(`${user.grade}학년 ${user.cls}반 ${user.id}님 로그인 성공!`);
+  } else alert("아이디 또는 비밀번호가 틀렸습니다.");
+}
+</script>
+
+</body>
+</html>
 
