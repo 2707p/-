@@ -1,1 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>월별 급식 안내</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
 
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    select {
+      font-size: 16px;
+      padding: 8px;
+      margin: 0 auto 20px;
+      display: block;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .day {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 5px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .day:hover {
+      background: #cce5ff;
+    }
+
+    .meal-info {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .meal-box {
+      background-color: #fffbe6;
+      padding: 15px;
+      display: inline-block;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .no-meal {
+      color: gray;
+    }
+  </style>
+</head>
+<body>
+  <h1>월별 급식 안내</h1>
+
+  <!-- 월 선택 -->
+  <select id="monthSelect">
+    <option value="2025-09">2025년 9월</option>
+    <option value="2025-10">2025년 10월</option>
+    <option value="2025-11">2025년 11월</option>
+    <option value="2025-12">2025년 12월</option>
+    <option value="2026-01">2026년 1월</option>
+    <option value="2026-02">2025년 2월</option>
+  </select>
+
+  <!-- 달력 표시 -->
+  <div class="calendar" id="calendar"></div>
+
+  <!-- 급식 정보 -->
+  <div class="meal-info" id="mealInfo">
+    <h2>날짜를 선택하세요</h2>
+  </div>
+
+  <script>
+    const mealData = {
+        "2025-09": {
+        "01": [],
+        "02": [],
+        "03": [],
+        "10": []
+      },
+    
+
+    const monthSelect = document.getElementById('monthSelect');
+    const calendar = document.getElementById('calendar');
+    const mealInfo = document.getElementById('mealInfo');
+
+    monthSelect.addEventListener('change', renderCalendar);
+
+    function renderCalendar() {
+      const selectedMonth = monthSelect.value;
+      const [year, month] = selectedMonth.split('-');
+      const daysInMonth = new Date(year, month, 0).getDate(); // 해당 월의 마지막 날짜
+
+      calendar.innerHTML = ''; // 이전 내용 초기화
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayStr = String(day).padStart(2, '0');
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day';
+        dayDiv.textContent = day;
+        dayDiv.onclick = () => showMeal(selectedMonth, dayStr);
+        calendar.appendChild(dayDiv);
+      }
+
+      // 초기화
+      mealInfo.innerHTML = `<h2>날짜를 선택하세요</h2>`;
+    }
+
+    function showMeal(month, day) {
+      const meals = mealData[month] && mealData[month][day];
+
+      mealInfo.innerHTML = `<h2>${month}월 ${day}일 급식</h2>`;
+      if (meals) {
+        const list = meals.map(item => `<li>${item}</li>`).join('');
+        mealInfo.innerHTML += `<div class="meal-box"><ul>${list}</ul></div>`;
+      } else {
+        mealInfo.innerHTML += `<p class="no-meal">등록된 급식 정보가 없습니다.</p>`;
+      }
+    }
+
+    // 첫 월 자동 렌더링
+    renderCalendar();
+  </script>
+</body>
+</html>
