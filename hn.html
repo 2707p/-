@@ -1,1 +1,278 @@
+<script>
+let users = JSON.parse(localStorage.getItem('users')||"[]");
 
+const timetables = {
+  "1-1": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>공영2</td><td>한사2</td><td>공수2</td><td>통사2</td><td>지식</td></tr>
+      <tr><td>2교시</td><td>공수2</td><td>통과2</td><td>통사2</td><td>통과2</td><td>미술</td></tr>
+      <tr><td>3교시</td><td>한사2</td><td>공국2</td><td>체육2</td><td>미술</td><td>공영2</td></tr>
+      <tr><td>4교시</td><td>체육2</td><td>지식</td><td>한사2</td><td>지식</td><td>통과2</td></tr>
+      <tr><td>5교시</td><td>공국2</td><td>진로</td><td>공영2</td><td>중문</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>중문</td><td>중문</td><td>과탐2</td><td>공수2</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>통사2</td><td>-</td><td>공국2</td><td>-</td><td>창체</td></tr>
+    </table>
+  `,
+  "1-2": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>통사2</td><td>통사2</td><td>공영2</td><td>미술</td><td>체육2</td></tr>
+      <tr><td>2교시</td><td>한사2</td><td>한사2</td><td>지식</td><td>공국2</td><td>공수2</td></tr>
+      <tr><td>3교시</td><td>지식</td><td>미술</td><td>공국2</td><td>한사2</td><td>과탐2</td></tr>
+      <tr><td>4교시</td><td>통과2</td><td>공영2</td><td>진로</td><td>통과2</td><td>공영2</td></tr>
+      <tr><td>5교시</td><td>공국2</td><td>공수2</td><td>통과2</td><td>일문</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>일문</td><td>일문</td><td>통사2</td><td>지식</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>체육2</td><td>공수2</td><td>-</td><td>-</td><td>-</td></tr>
+    </table>
+  `,
+  "1-3": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>통과2</td><td>일문</td><td>통사2</td><td>공국2</td><td>통과2</td></tr>
+      <tr><td>2교시</td><td>공국2</td><td>공수2</td><td>공영2</td><td>공수2</td><td>한사2</td></tr>
+      <tr><td>3교시</td><td>체육2</td><td>공영2</td><td>과탐2</td><td>통과2</td><td>통사2</td></tr>
+      <tr><td>4교시</td><td>일문</td><td>진로</td><td>지식</td><td>한사2</td><td>지식</td></tr>
+      <tr><td>5교시</td><td>통사2</td><td>한사2</td><td>공수2</td><td>미술</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>공영2</td><td>미술</td><td>공국2</td><td>일문</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>지식</td><td>체육2</td><td>-</td><td>-</td><td>창체</td></tr>
+    </table>
+  `,
+  "1-4": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>공국2</td><td>통과2</td><td>체육2</td><td>정보</td><td>진로</td></tr>
+      <tr><td>2교시</td><td>통사2</td><td>음악2</td><td>정보</td><td>통사2</td><td>한사2</td></tr>
+      <tr><td>3교시</td><td>통과2</td><td>공수2</td><td>공수2</td><td>한사2</td><td>일문</td></tr>
+      <tr><td>4교시</td><td>정보</td><td>통사2</td><td>통과2</td><td>공영2</td><td>체육2</td></tr>
+      <tr><td>5교시</td><td>공수2</td><td>공영2</td><td>공국2</td><td>일문</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>과탐2</td><td>일문</td><td>공영2</td><td>음악2</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>한사2</td><td>공국2</td><td>-</td><td>-</td><td>창체</td></tr>
+    </table>
+  `,
+  "1-5": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>체육2</td><td>음악2</td><td>통사2</td><td>통과2</td><td>정보</td></tr>
+      <tr><td>2교시</td><td>통과2</td><td>일문</td><td>한사2</td><td>음악2</td><td>통사2</td></tr>
+      <tr><td>3교시</td><td>과탐2</td><td>정보</td><td>공영2</td><td>진로</td><td>공국2</td></tr>
+      <tr><td>4교시</td><td>공국2</td><td>한사2</td><td>통과2</td><td>정보</td><td>공수2</td></tr>
+      <tr><td>5교시</td><td>통사2</td><td>체육2</td><td>일문</td><td>공영2</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>공영2</td><td>공국2</td><td>공수2</td><td>한사2</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>공수2</td><td>일문</td><td>-</td><td>-</td><td>창체</td></tr>
+    </table>
+  `,
+  "1-6": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>정보</td><td>한사2</td><td>공국2</td><td>통과2</td><td>통과2</td></tr>
+      <tr><td>2교시</td><td>공수2</td><td>공수2</td><td>공영2</td><td>일문</td><td>체육2</td></tr>
+      <tr><td>3교시</td><td>통과2</td><td>음악2</td><td>일문</td><td>공영2</td><td>통사2</td></tr>
+      <tr><td>4교시</td><td>공영2</td><td>정보</td><td>한사2</td><td>음악2</td><td>정보</td></tr>
+      <tr><td>5교시</td><td>체육2</td><td>일문</td><td>공수2</td><td>진로</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>통사2</td><td>과탐2</td><td>통사2</td><td>공국2</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>공국2</td><td>한사2</td><td>-</td><td>-</td><td>창체</td></tr>
+    </table>
+  `,
+  "1-7": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>한사2</td><td>공영2</td><td>공수2</td><td>과탐2</td><td>공영2</td></tr>
+      <tr><td>2교시</td><td>공영2</td><td>체육2</td><td>통과2</td><td>한사2</td><td>음악2</td></tr>
+      <tr><td>3교시</td><td>일문</td><td>일문</td><td>정보</td><td>공국2</td><td>한사2</td></tr>
+      <tr><td>4교시</td><td>진로</td><td>음악2</td><td>공국2</td><td>공수2</td><td>공국2</td></tr>
+      <tr><td>5교시</td><td>통사2</td><td>공수2</td><td>일문</td><td>통과2</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>통과2</td><td>정보</td><td>체육2</td><td>정보</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>통사2</td><td>통사2</td><td>-</td><td>-</td><td>창체</td></tr>
+    </table>
+  `
+};
+  </script>
+<script>
+Object.assign(timetables, {
+  "2-1": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>한사</td><td>영어Ⅱ</td><td>영어Ⅱ</td><td>음악2</td><td>수학Ⅱ</td></tr>
+      <tr><td>2교시</td><td>수학Ⅱ</td><td>사회B</td><td>수학Ⅱ</td><td>영어Ⅱ</td><td>일문</td></tr>
+      <tr><td>3교시</td><td>사회C</td><td>수학Ⅱ</td><td>사회B</td><td>사회B</td><td>스생</td></tr>
+      <tr><td>4교시</td><td>독서</td><td>독서</td><td>확통</td><td>일문</td><td>사회A</td></tr>
+      <tr><td>5교시</td><td>확통</td><td>한사</td><td>사회A</td><td>사회C</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>영어Ⅱ</td><td>사회C</td><td>독서</td><td>독서</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>사회A</td><td>-</td><td>창체</td></tr>
+    </table>
+  `,
+  "2-2": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>음악2</td><td>수학Ⅱ</td><td>미감</td><td>스생</td><td>한사</td></tr>
+      <tr><td>2교시</td><td>한사</td><td>사회B</td><td>영어Ⅱ</td><td>독서</td><td>영어Ⅱ</td></tr>
+      <tr><td>3교시</td><td>사회C</td><td>독서</td><td>사회B</td><td>사회B</td><td>수학Ⅱ</td></tr>
+      <tr><td>4교시</td><td>영어Ⅱ</td><td>미감</td><td>독서</td><td>영어Ⅱ</td><td>사회A</td></tr>
+      <tr><td>5교시</td><td>수학Ⅱ</td><td>중문</td><td>사회A</td><td>사회C</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>독서</td><td>사회C</td><td>중문</td><td>수학Ⅱ</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>사회A</td><td>창체</td></tr>
+    </table>
+  `,
+  "2-3": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>영어Ⅱ</td><td>독서</td><td>확통</td><td>수학Ⅱ</td><td>독서</td></tr>
+      <tr><td>2교시</td><td>수학Ⅱ</td><td>사회B</td><td>영어Ⅱ</td><td>독서</td><td>수학Ⅱ</td></tr>
+      <tr><td>3교시</td><td>사회C</td><td>한사</td><td>사회B</td><td>사회B</td><td>영어Ⅱ</td></tr>
+      <tr><td>4교시</td><td>음악2</td><td>확통</td><td>수학Ⅱ</td><td>스생</td><td>사회A</td></tr>
+      <tr><td>5교시</td><td>한사</td><td>일문</td><td>사회A</td><td>사회C</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>독서</td><td>사회C</td><td>일문</td><td>영어Ⅱ</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>사회A</td><td>창체</td></tr>
+    </table>
+  `,
+  "2-4": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>독서</td><td>수학Ⅱ</td><td>수학Ⅱ</td><td>독서</td><td>영어Ⅱ</td></tr>
+      <tr><td>2교시</td><td>음악2</td><td>사회B</td><td>일문</td><td>한사</td><td>한사</td></tr>
+      <tr><td>3교시</td><td>사회C</td><td>일문</td><td>사회B</td><td>사회B</td><td>확통</td></tr>
+      <tr><td>4교시</td><td>영어Ⅱ</td><td>독서</td><td>스생</td><td>영어Ⅱ</td><td>사회A</td></tr>
+      <tr><td>5교시</td><td>수학Ⅱ</td><td>영어Ⅱ</td><td>사회A</td><td>사회C</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>확통</td><td>사회C</td><td>독서</td><td>수학Ⅱ</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>사회A</td><td>창체</td></tr>
+    </table>
+  `,
+  "2-5": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>과학A 물리Ⅰ</td><td>기하</td><td>과학A 물리Ⅰ</td><td>수학Ⅱ</td><td>기하</td></tr>
+      <tr><td>2교시</td><td>확통</td><td>과학C 화학Ⅰ</td><td>독서</td><td>과학C 화학Ⅰ</td><td>과학B 생과Ⅰ</td></tr>
+      <tr><td>3교시</td><td>수학Ⅱ</td><td>영어Ⅱ</td><td>수학Ⅱ</td><td>스생</td><td>음악2</td></tr>
+      <tr><td>4교시</td><td>독서</td><td>수학Ⅱ</td><td>과학B 생과Ⅰ</td><td>과학A 물리Ⅰ</td><td>영어Ⅱ</td></tr>
+      <tr><td>5교시</td><td>과학C 화학Ⅰ</td><td>과학B 생과Ⅰ</td><td>영어Ⅱ</td><td>확통</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>한사</td><td>독서</td><td>한사</td><td>독서</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>영어Ⅱ</td><td>창체</td></tr>
+    </table>
+  `,
+  "2-6": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>과학A 화학Ⅰ</td><td>스생</td><td>과학A 화학Ⅰ</td><td>확통</td><td>영어Ⅱ</td></tr>
+      <tr><td>2교시</td><td>영어Ⅱ</td><td>과학C 생과Ⅰ</td><td>독서</td><td>과학C 생과Ⅰ</td><td>과학B 물리Ⅰ</td></tr>
+      <tr><td>3교시</td><td>확통</td><td>독서</td><td>기하</td><td>영어Ⅱ</td><td>독서</td></tr>
+      <tr><td>4교시</td><td>독서</td><td>영어Ⅱ</td><td>과학B 물리Ⅰ</td><td>과학A 화학Ⅰ</td><td>수학Ⅱ</td></tr>
+      <tr><td>5교시</td><td>과학C 생과Ⅰ</td><td>과학B 물리Ⅰ</td><td>한사</td><td>수학Ⅱ</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>수학Ⅱ</td><td>수학Ⅱ</td><td>음악2</td><td>기하</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>한사</td><td>창체</td></tr>
+    </table>
+  `,
+  "2-7": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>과학A 생과Ⅰ</td><td>독서</td><td>과학A 생과Ⅰ</td><td>기하</td><td>수학Ⅱ</td></tr>
+      <tr><td>2교시</td><td>영어Ⅱ</td><td>과학C 물리Ⅰ</td><td>수학Ⅱ</td><td>과학C 물리Ⅰ</td><td>과학B 화학Ⅰ</td></tr>
+      <tr><td>3교시</td><td>독서</td><td>영어Ⅱ</td><td>음악2</td><td>수학Ⅱ</td><td>독서</td></tr>
+      <tr><td>4교시</td><td>기하</td><td>수학Ⅱ</td><td>과학B 화학Ⅰ</td><td>과학A 생과Ⅰ</td><td>한사</td></tr>
+      <tr><td>5교시</td><td>과학C 물리Ⅰ</td><td>과학B 화학Ⅰ</td><td>독서</td><td>한사</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>스생</td><td>확통</td><td>영어Ⅱ</td><td>확통</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>영어Ⅱ</td><td>창체</td></tr>
+    </table>
+  `
+});
+</script>
+<script>
+Object.assign(timetables, {
+  "3-1": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>심국</td><td>사회C 생윤</td><td>사회A 한지</td><td>사회C 생윤</td><td>현문</td></tr>
+      <tr><td>2교시</td><td>수과</td><td>심영Ⅰ</td><td>사회C 생윤</td><td>사회B 지역</td><td>심국</td></tr>
+      <tr><td>3교시</td><td>운건</td><td>사회B 지역</td><td>심영Ⅰ</td><td>심국</td><td>수과</td></tr>
+      <tr><td>4교시</td><td>심영Ⅰ</td><td>사회A 한지</td><td>사회B 지역</td><td>사회A 한지</td><td>운건</td></tr>
+      <tr><td>5교시</td><td>심리</td><td>심국</td><td>심리</td><td>심영Ⅰ</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>생활</td><td>수과</td><td>수과</td><td>생활</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>현문</td><td>창체</td></tr>
+    </table>
+  `,
+  "3-2": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>심국</td><td>사회C 지역</td><td>사회A 사문</td><td>사회C 지역</td><td>고문</td></tr>
+      <tr><td>2교시</td><td>수과</td><td>심영Ⅰ</td><td>사회C 지역</td><td>사회B</td><td>심국</td></tr>
+      <tr><td>3교시</td><td>생활</td><td>사회B</td><td>심영Ⅰ</td><td>심국</td><td>수과</td></tr>
+      <tr><td>4교시</td><td>운건</td><td>사회A 사문</td><td>사회B</td><td>사회A 사문</td><td>심영Ⅰ</td></tr>
+      <tr><td>5교시</td><td>심리</td><td>심국</td><td>심리</td><td>생활</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>심영Ⅰ</td><td>수과</td><td>수과</td><td>운건</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>고문</td><td>창체</td></tr>
+    </table>
+  `,
+  "3-3": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>심국</td><td>사회C 동사</td><td>사회A 생윤</td><td>사회C 동사</td><td>수과</td></tr>
+      <tr><td>2교시</td><td>생활</td><td>영화</td><td>사회C 동사</td><td>사회B 사문</td><td>심국</td></tr>
+      <tr><td>3교시</td><td>심영Ⅰ</td><td>사회B 사문</td><td>수과</td><td>심국</td><td>심영Ⅰ</td></tr>
+      <tr><td>4교시</td><td>수과</td><td>사회A 생윤</td><td>사회B 사문</td><td>사회A 생윤</td><td>영화</td></tr>
+      <tr><td>5교시</td><td>실경</td><td>심국</td><td>실경</td><td>심영Ⅰ</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>운건</td><td>운건</td><td>심영Ⅰ</td><td>생활</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>수과</td><td>창체</td></tr>
+    </table>
+  `,
+  "3-4": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>고전</td><td>사회C 사문</td><td>사회A 지역</td><td>사회C 사문</td><td>수과</td></tr>
+      <tr><td>2교시</td><td>심영Ⅰ</td><td>운건</td><td>사회C 사문</td><td>사회B 생윤</td><td>고전</td></tr>
+      <tr><td>3교시</td><td>영화</td><td>사회B 생윤</td><td>수과</td><td>고전</td><td>생활</td></tr>
+      <tr><td>4교시</td><td>수과</td><td>사회A 지역</td><td>사회B 생윤</td><td>사회A 지역</td><td>심영Ⅰ</td></tr>
+      <tr><td>5교시</td><td>교육</td><td>고전</td><td>교육</td><td>영화</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>생활</td><td>심영Ⅰ</td><td>운건</td><td>심영Ⅰ</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>수과</td><td>창체</td></tr>
+    </table>
+  `,
+  "3-5": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>심영Ⅰ</td><td>심수Ⅱ</td><td>심수Ⅱ</td><td>운건</td><td>사탐</td></tr>
+      <tr><td>2교시</td><td>사탐</td><td>심국</td><td>과학C</td><td>심수Ⅱ</td><td>운건</td></tr>
+      <tr><td>3교시</td><td>심국</td><td>과학B</td><td>심국</td><td>과학C</td><td>과학A 화학Ⅱ</td></tr>
+      <tr><td>4교시</td><td>과학A 화학Ⅱ</td><td>심영Ⅰ</td><td>심영Ⅰ</td><td>심수Ⅰ</td><td>심수Ⅰ</td></tr>
+      <tr><td>5교시</td><td>보건</td><td>과학C</td><td>보건</td><td>심국</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>심수Ⅱ</td><td>과학A 화학Ⅱ</td><td>과학B</td><td>심영Ⅰ</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>과학B</td><td>창체</td></tr>
+    </table>
+  `,
+  "3-6": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>심수Ⅱ</td><td>운건</td><td>운건</td><td>심수Ⅱ</td><td>심영Ⅰ</td></tr>
+      <tr><td>2교시</td><td>사탐</td><td>심국</td><td>과학C 생과Ⅱ</td><td>심영Ⅰ</td><td>심수Ⅱ</td></tr>
+      <tr><td>3교시</td><td>심국</td><td>과학B 화학Ⅱ</td><td>심국</td><td>과학C 생과Ⅱ</td><td>과학A 물리Ⅱ</td></tr>
+      <tr><td>4교시</td><td>과학A 물리Ⅱ</td><td>심영Ⅰ</td><td>심수Ⅱ</td><td>인수</td><td>인수</td></tr>
+      <tr><td>5교시</td><td>환경</td><td>과학C 생과Ⅱ</td><td>환경</td><td>심국</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>심영Ⅰ</td><td>과학A 물리Ⅱ</td><td>과학B 화학Ⅱ</td><td>사탐</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>과학B 화학Ⅱ</td><td>창체</td></tr>
+    </table>
+  `,
+  "3-7": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>사탐</td><td>심영Ⅰ</td><td>심수Ⅱ</td><td>심영Ⅰ</td><td>운건</td></tr>
+      <tr><td>2교시</td><td>심영Ⅰ</td><td>심국</td><td>과학C</td><td>심수Ⅰ</td><td>사탐</td></tr>
+      <tr><td>3교시</td><td>심국</td><td>과학B 물리Ⅱ</td><td>심국</td><td>과학C</td><td>과학A 생과Ⅱ</td></tr>
+      <tr><td>4교시</td><td>과학A 생과Ⅱ</td><td>심수Ⅱ</td><td>심영Ⅰ</td><td>운건</td><td>심수Ⅱ</td></tr>
+      <tr><td>5교시</td><td>환경</td><td>과학C</td><td>환경</td><td>심국</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>심수Ⅰ</td><td>과학A 생과Ⅱ</td><td>과학B 물리Ⅱ</td><td>심수Ⅱ</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>과학B 물리Ⅱ</td><td>창체</td></tr>
+    </table>
+  `,
+  "3-8": `
+    <table>
+      <tr><th>교시/요일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr>
+      <tr><td>1교시</td><td>심수Ⅰ</td><td>심영Ⅰ</td><td>심영Ⅰ</td><td>심영Ⅰ</td><td>심수Ⅰ</td></tr>
+      <tr><td>2교시</td><td>운건</td><td>과학C 고전</td><td>지과Ⅱ</td><td>운건</td><td>심영Ⅰ</td></tr>
+      <tr><td>3교시</td><td>고전</td><td>과학B 생과Ⅱ</td><td>고전</td><td>과학C 지과Ⅱ</td><td>과학A</td></tr>
+      <tr><td>4교시</td><td>과학A</td><td>심수Ⅱ</td><td>심수Ⅱ</td><td>심수Ⅱ</td><td>사탐</td></tr>
+      <tr><td>5교시</td><td>환경</td><td>과학C 지과Ⅱ</td><td>환경</td><td>고전</td><td>창체</td></tr>
+      <tr><td>6교시</td><td>심수Ⅱ</td><td>과학A</td><td>과학B 생과Ⅱ</td><td>사탐</td><td>창체</td></tr>
+      <tr><td>7교시</td><td>-</td><td>-</td><td>-</td><td>과학B 생과Ⅱ</td><td>창체</td></tr>
+    </table>
+  `
+});
+</script>
