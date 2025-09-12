@@ -2,63 +2,23 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>창원 성민여자고 포털 로그인</title>
+<title>창원 성민여자고 포털</title>
 <style>
-body { font-family: Arial; background:#f9f9f9; padding:20px;}
+body { font-family: Arial; background:#f9f9f9; padding:20px; margin:0;}
 section { background:#fff; padding:20px; border-radius:8px; width:300px; margin:30px auto; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
 input { width:90%; padding:5px; margin:5px 0;}
 button { padding:5px 10px; border:none; border-radius:5px; background:#3498db; color:white; cursor:pointer; margin:5px 0;}
 button:hover { background:#2980b9;}
-/* 사이드바 */
-#sidebar {
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1000;
-  top: 0;
-  left: 0;
-  background-color: #2c3e50;
-  overflow-x: hidden;
-  transition: 0.3s;
-  padding-top: 60px;
-}
-#sidebar a {
-  padding: 10px 20px;
-  text-decoration: none;
-  font-size: 18px;
-  color: white;
-  display: block;
-  transition: 0.3s;
-}
-#sidebar a:hover {
-  background: #34495e;
-}
-#sidebar-close {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  font-size: 36px;
-  cursor: pointer;
-  color:white;
-}
-#sidebar-toggle {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  padding: 5px 10px;
-  border:none;
-  border-radius:5px;
-  background:#3498db;
-  color:white;
-  cursor:pointer;
-  z-index: 1100;
-  display:none;
-}
+#sidebar { height:100%; width:0; position:fixed; z-index:1; top:0; left:0; background:#2c3e50; overflow-x:hidden; transition:0.3s; padding-top:60px;}
+#sidebar a { padding:10px 15px; text-decoration:none; font-size:18px; color:#ecf0f1; display:block; transition:0.2s;}
+#sidebar a:hover { background:#34495e; }
+#sidebar-close { position:absolute; top:10px; right:20px; font-size:36px; cursor:pointer; color:white;}
+#openSidebarBtn { position:fixed; top:20px; left:20px; z-index:2; background:#3498db; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;}
 </style>
 </head>
 <body>
 
-<!-- 로그인/회원가입 -->
+<!-- 로그인 -->
 <section id="login-section">
   <h2>로그인</h2>
   <input id="login-id" placeholder="아이디">
@@ -67,6 +27,7 @@ button:hover { background:#2980b9;}
   <p>계정이 없나요? <button onclick="showSignup()">회원가입</button></p>
 </section>
 
+<!-- 회원가입 -->
 <section id="signup-section" style="display:none">
   <h2>회원가입</h2>
   <input id="signup-id" placeholder="아이디">
@@ -75,6 +36,14 @@ button:hover { background:#2980b9;}
   <input id="signup-class" type="number" placeholder="반">
   <button onclick="signup()">가입하기</button>
   <button onclick="hideSignup()">취소</button>
+</section>
+
+<!-- 메인 화면 -->
+<section id="main-section" style="display:none">
+  <h2>환영합니다!</h2>
+  <p id="welcome-msg"></p>
+  <button onclick="logout()">로그아웃</button>
+  <button id="openSidebarBtn" onclick="openSidebar()">☰ 더보기</button>
 </section>
 
 <!-- 사이드바 -->
@@ -87,11 +56,10 @@ button:hover { background:#2980b9;}
   <a href="dea.html">대나무숲</a>
 </div>
 
-<button id="sidebar-toggle" onclick="openSidebar()">더보기</button>
-
 <script>
 let users = JSON.parse(localStorage.getItem('users')||"[]");
 
+// 회원가입 화면 표시
 function showSignup(){
   document.getElementById('login-section').style.display='none';
   document.getElementById('signup-section').style.display='block';
@@ -101,6 +69,7 @@ function hideSignup(){
   document.getElementById('login-section').style.display='block';
 }
 
+// 회원가입
 function signup(){
   let id = document.getElementById('signup-id').value.trim();
   let pw = document.getElementById('signup-pw').value.trim();
@@ -108,47 +77,50 @@ function signup(){
   let cls = parseInt(document.getElementById('signup-class').value);
   if(!id||!pw||!grade||!cls){ alert("모든 항목을 입력해주세요."); return;}
   if(users.some(u=>u.id===id)){ alert("이미 존재하는 아이디입니다."); return;}
-  users.push({id,pw,grade,cls});
+  let newUser = {id,pw,grade,cls};
+  users.push(newUser);
   localStorage.setItem('users', JSON.stringify(users));
-  alert("회원가입 완료!");
-  hideSignup();
+  localStorage.setItem('currentUser', JSON.stringify(newUser)); // 자동 로그인
+  alert("회원가입 완료! 자동 로그인 되었습니다.");
+  showMainPage(newUser);
 }
 
+// 로그인
 function login(){
-  let id = document.getElementById('login-id').value;
-  let pw = document.getElementById('login-pw').value;
+  let id = document.getElementById('login-id').value.trim();
+  let pw = document.getElementById('login-pw').value.trim();
+  users = JSON.parse(localStorage.getItem('users')||"[]");
   const user = users.find(u=>u.id===id && u.pw===pw);
   if(user){
     localStorage.setItem('currentUser', JSON.stringify(user));
     alert(`${user.grade}학년 ${user.cls}반 ${user.id}님 로그인 성공!`);
-    showPortal();
+    showMainPage(user);
   } else alert("아이디 또는 비밀번호가 틀렸습니다.");
 }
 
+// 메인 화면 표시
+function showMainPage(user){
+  document.getElementById('login-section').style.display='none';
+  document.getElementById('signup-section').style.display='none';
+  document.getElementById('main-section').style.display='block';
+  document.getElementById('welcome-msg').textContent=`${user.grade}학년 ${user.cls}반 ${user.id}님 환영합니다!`;
+}
+
+// 로그인 유지
+window.onload = function(){
+  let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  if(currentUser) showMainPage(currentUser);
+}
+
+// 로그아웃
 function logout(){
   localStorage.removeItem('currentUser');
   location.reload();
 }
 
-function showPortal(){
-  document.getElementById('login-section').style.display='none';
-  document.getElementById('signup-section').style.display='none';
-  document.getElementById('sidebar-toggle').style.display='block';
-}
-
-// 새로고침 후 로그인 유지
-window.onload = function(){
-  const user = JSON.parse(localStorage.getItem('currentUser'));
-  if(user) showPortal();
-}
-
-// 사이드바 열기/닫기
-function openSidebar(){
-  document.getElementById('sidebar').style.width='220px';
-}
-function closeSidebar(){
-  document.getElementById('sidebar').style.width='0';
-}
+// 사이드바
+function openSidebar(){ document.getElementById('sidebar').style.width='200px'; }
+function closeSidebar(){ document.getElementById('sidebar').style.width='0'; }
 </script>
 
 </body>
