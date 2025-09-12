@@ -1,1 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>학사일정 달력</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+    }
 
+    h1 {
+      margin-top: 20px;
+    }
+
+    .calendar {
+      width: 90%;
+      max-width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .calendar-header button {
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-top: 20px;
+    }
+
+    .day, .date {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .day {
+      font-weight: bold;
+      background-color: #eee;
+    }
+
+    .date {
+      height: 80px;
+      position: relative;
+    }
+
+    .event {
+      background-color: #ffcc00;
+      color: #000;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 12px;
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+      right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📅 학사일정 달력</h1>
+  <div class="calendar">
+    <div class="calendar-header">
+      <button onclick="changeMonth(-1)">이전 달</button>
+      <h2 id="monthYear"></h2>
+      <button onclick="changeMonth(1)">다음 달</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid">
+    </div>
+  </div>
+
+  <script>
+    const calendarGrid = document.getElementById('calendarGrid');
+    const monthYear = document.getElementById('monthYear');
+    let currentDate = new Date();
+
+    const events = {
+      "2025-09-03": "모의평가",
+      "2025-09-12": "동아리활동",
+      "2025-09-19": "현장체험학습",
+      "2025-09-29": "수학여행",
+      "2025-09-30": "수학여행",
+      "2025-10-01": "수학여행",
+      "2025-10-02": "수학여행",
+      "2025-10-03": "개천절",
+      "2025-10-05": "추석연휴",
+      "2025-10-06": "추석연휴",
+      "2025-10-07": "추석연휴",
+      "2025-10-08": "대체휴일",
+      "2025-10-09": "한글날",
+    };
+
+    function renderCalendar(date) {
+      calendarGrid.innerHTML = "";
+
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const firstDay = new Date(year, month, 1).getDay();
+      const lastDate = new Date(year, month + 1, 0).getDate();
+
+      monthYear.textContent = `${year}년 ${month + 1}월`;
+
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      for (let day of days) {
+        const dayElem = document.createElement('div');
+        dayElem.className = 'day';
+        dayElem.textContent = day;
+        calendarGrid.appendChild(dayElem);
+      }
+
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'date';
+        calendarGrid.appendChild(emptyCell);
+      }
+
+      for (let i = 1; i <= lastDate; i++) {
+        const dateCell = document.createElement('div');
+        dateCell.className = 'date';
+        const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+
+        dateCell.textContent = i;
+
+        if (events[fullDate]) {
+          const eventDiv = document.createElement('div');
+          eventDiv.className = 'event';
+          eventDiv.textContent = events[fullDate];
+          dateCell.appendChild(eventDiv);
+        }
+
+        calendarGrid.appendChild(dateCell);
+      }
+    }
+
+    function changeMonth(offset) {
+      currentDate.setMonth(currentDate.getMonth() + offset);
+      renderCalendar(currentDate);
+    }
+
+    renderCalendar(currentDate);
+  </script>
+</body>
+</html>
