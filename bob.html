@@ -2,29 +2,34 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>월별 급식 안내</title>
+  <title>급식 안내</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
+      margin: 30px;
+      text-align: center;
     }
 
     h1 {
-      text-align: center;
-      margin-bottom: 20px;
+      font-size: 36px;
+      font-weight: bold;
     }
 
-    select {
-      font-size: 16px;
-      padding: 8px;
-      margin: 0 auto 20px;
-      display: block;
+    .nav-buttons {
+      margin: 20px 0;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin: 0 10px;
+      cursor: pointer;
     }
 
     .calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
+      gap: 10px;
       max-width: 600px;
       margin: 0 auto;
     }
@@ -33,9 +38,7 @@
       background: #f0f0f0;
       padding: 15px;
       border-radius: 5px;
-      text-align: center;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
     .day:hover {
@@ -44,15 +47,22 @@
 
     .meal-info {
       margin-top: 30px;
-      text-align: center;
     }
 
     .meal-box {
-      background-color: #fffbe6;
-      padding: 15px;
       display: inline-block;
+      background: #fffbe6;
+      padding: 15px;
+      margin: 10px;
       border-radius: 10px;
+      width: 250px;
+      vertical-align: top;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .meal-title {
+      font-weight: bold;
+      margin-bottom: 5px;
     }
 
     .no-meal {
@@ -61,75 +71,116 @@
   </style>
 </head>
 <body>
-  <h1>월별 급식 안내</h1>
+  <h1>급식 안내</h1>
+  <div class="nav-buttons">
+    <button onclick="prevMonth()">◀ 이전 달</button>
+    <span id="currentMonth" style="font-size: 20px; font-weight: bold;"></span>
+    <button onclick="nextMonth()">다음 달 ▶</button>
+  </div>
 
-  <!-- 월 선택 -->
-  <select id="monthSelect">
-    <option value="2025-09">2025년 9월</option>
-    <option value="2025-10">2025년 10월</option>
-    <option value="2025-11">2025년 11월</option>
-    <option value="2025-12">2025년 12월</option>
-    <option value="2026-01">2026년 1월</option>
-    <option value="2026-02">2025년 2월</option>
-  </select>
-
-  <!-- 달력 표시 -->
   <div class="calendar" id="calendar"></div>
 
-  <!-- 급식 정보 -->
   <div class="meal-info" id="mealInfo">
     <h2>날짜를 선택하세요</h2>
   </div>
 
   <script>
+    let currentYear = 2025;
+    let currentMonth = 9;
+
     const mealData = {
-        "2025-09": {
-        "01": [],
-        "02": [],
-        "03": [],
-        "10": []
+      "2025-09": {
+        "01": {
+          breakfast: [],
+          lunch: [],
+          dinner: []
+        },
+        "02": {
+          breakfast: [],
+          lunch: [],
+          dinner: []
+        }
       },
-    
+      "2025-10": {
+        "01": {
+          breakfast: [],
+          lunch: [],
+          dinner: []
+        }
+      }
+    };
 
-    const monthSelect = document.getElementById('monthSelect');
-    const calendar = document.getElementById('calendar');
-    const mealInfo = document.getElementById('mealInfo');
-
-    monthSelect.addEventListener('change', renderCalendar);
+    function updateMonthLabel() {
+      const monthStr = `${currentYear}년 ${currentMonth.toString().padStart(2, '0')}월`;
+      document.getElementById("currentMonth").textContent = monthStr;
+    }
 
     function renderCalendar() {
-      const selectedMonth = monthSelect.value;
-      const [year, month] = selectedMonth.split('-');
-      const daysInMonth = new Date(year, month, 0).getDate(); // 해당 월의 마지막 날짜
-
-      calendar.innerHTML = ''; // 이전 내용 초기화
+      updateMonthLabel();
+      const calendar = document.getElementById('calendar');
+      calendar.innerHTML = '';
+      const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
 
       for (let day = 1; day <= daysInMonth; day++) {
         const dayStr = String(day).padStart(2, '0');
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'day';
-        dayDiv.textContent = day;
-        dayDiv.onclick = () => showMeal(selectedMonth, dayStr);
-        calendar.appendChild(dayDiv);
+        const div = document.createElement('div');
+        div.className = 'day';
+        div.textContent = `${day}일`;
+        div.onclick = () => showMeal(dayStr);
+        calendar.appendChild(div);
       }
 
-      // 초기화
-      mealInfo.innerHTML = `<h2>날짜를 선택하세요</h2>`;
+      document.getElementById('mealInfo').innerHTML = `<h2>날짜를 선택하세요</h2>`;
     }
 
-    function showMeal(month, day) {
-      const meals = mealData[month] && mealData[month][day];
+    function showMeal(dayStr) {
+      const monthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+      const meal = mealData[monthKey]?.[dayStr];
 
-      mealInfo.innerHTML = `<h2>${month}월 ${day}일 급식</h2>`;
-      if (meals) {
-        const list = meals.map(item => `<li>${item}</li>`).join('');
-        mealInfo.innerHTML += `<div class="meal-box"><ul>${list}</ul></div>`;
-      } else {
-        mealInfo.innerHTML += `<p class="no-meal">등록된 급식 정보가 없습니다.</p>`;
+      const mealInfo = document.getElementById('mealInfo');
+      mealInfo.innerHTML = `<h2>${monthKey} ${dayStr}일 급식 정보</h2>`;
+
+      ['breakfast', 'lunch', 'dinner'].forEach(type => {
+        const title = {
+          breakfast: '🍞 아침',
+          lunch: '🍚 점심',
+          dinner: '🍱 저녁'
+        }[type];
+
+        const items = meal?.[type];
+        const box = document.createElement('div');
+        box.className = 'meal-box';
+        box.innerHTML = `<div class="meal-title">${title}</div>`;
+
+        if (items && items.length > 0) {
+          box.innerHTML += `<ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+        } else {
+          box.innerHTML += `<p class="no-meal">정보 없음</p>`;
+        }
+
+        mealInfo.appendChild(box);
+      });
+    }
+
+    function prevMonth() {
+      currentMonth--;
+      if (currentMonth < 1) {
+        currentMonth = 12;
+        currentYear--;
       }
+      renderCalendar();
     }
 
-    // 첫 월 자동 렌더링
+    function nextMonth() {
+      currentMonth++;
+      if (currentMonth > 12) {
+        currentMonth = 1;
+        currentYear++;
+      }
+      renderCalendar();
+    }
+
+    // 최초 실행
     renderCalendar();
   </script>
 </body>
