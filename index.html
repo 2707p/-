@@ -1,1 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>창원성민여자고등학교 포털</title>
+  <style>
+    * { box-sizing: border-box; font-family: "Noto Sans KR", sans-serif; }
+    body { margin: 0; background: #f5f8ff; color: #333; }
 
+    /* 상단 네비게이션 */
+    header {
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 8%;
+      font-weight: bold;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo img {
+      height: 38px;
+    }
+    .logo span {
+      font-size: 17px;
+      color: #1f57c9;
+      font-weight: 700;
+    }
+    nav a {
+      margin: 0 14px;
+      color: #222;
+      text-decoration: none;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+    nav a:hover { color: #1f57c9; }
+
+    /* 로그인 영역 */
+    .login-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(180deg, #e8f1ff 0%, #ffffff 100%);
+    }
+    .login-box {
+      background: white;
+      width: 380px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      padding: 40px;
+      text-align: center;
+      border-top: 6px solid #1f57c9;
+    }
+    .login-box h1 {
+      font-size: 22px;
+      color: #1f57c9;
+      margin-bottom: 6px;
+    }
+    .login-box p {
+      color: #777;
+      margin-bottom: 24px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      outline: none;
+      transition: 0.2s;
+    }
+    input:focus {
+      border-color: #1f57c9;
+      box-shadow: 0 0 0 2px rgba(31,87,201,0.2);
+    }
+    button {
+      width: 100%;
+      background: #1f57c9;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover { background: #1745a9; transform: translateY(-2px); }
+
+    /* 메인 페이지 */
+    .main-page { display: none; background: #f5f8ff; min-height: 100vh; }
+    .hero {
+      background: #eaf1ff;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .hero h2 { font-size: 28px; margin: 0; color: #333; }
+    .hero span { color: #1f57c9; font-weight: bold; }
+
+    .menu-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      padding: 60px 10%;
+    }
+    .menu-card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      text-align: center;
+      padding: 30px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .menu-card:hover { transform: translateY(-5px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+    .menu-card img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 12px;
+    }
+    .menu-card h3 { margin: 10px 0 6px; color: #1f57c9; }
+    .menu-card p { color: #555; font-size: 14px; }
+
+    footer {
+      background: white;
+      text-align: center;
+      padding: 20px;
+      color: #999;
+      font-size: 13px;
+      border-top: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 로그인 페이지 -->
+  <div class="login-wrapper" id="loginPage">
+    <div class="login-box">
+      <h1>창원성민여자고등학교</h1>
+      <p>포털 로그인</p>
+
+      <input type="text" id="studentId" placeholder="아이디 (예: 10101)" />
+      <input type="password" id="studentPw" placeholder="비밀번호" />
+
+      <button onclick="login()">로그인</button>
+    </div>
+  </div>
+
+  <!-- 메인 페이지 -->
+  <div class="main-page" id="mainPage">
+    <header>
+      <div class="logo">
+        <img src="logo.png" alt="창원성민여자고등학교 로고">
+        <span>창원성민여자고등학교</span>
+      </div>
+      <nav>
+        <a href="#">홈</a>
+        <a href="#">공지사항</a>
+        <a href="#">학사정보</a>
+        <a href="#">학교생활</a>
+        <a href="#" onclick="logout()">로그아웃</a>
+      </nav>
+    </header>
+
+    <div class="hero">
+      <h2><span>창원성민여자고등학교</h2>
+      <p style="color:#555; margin-top:8px;">창원성민여자고등학교 포털에 오신 것을 환영합니다.</p>
+    </div>
+
+    <section class="menu-container">
+      <div class="menu-card" onclick="alert('학사일정 페이지로 이동 예정!')">
+        <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" alt="학사일정">
+        <h3>학사일정</h3>
+        <p>학교의 주요 학사 일정을 확인하세요.</p>
+      </div>
+      <div class="menu-card" onclick="alert('급식 페이지로 이동 예정!')">
+        <img src="https://cdn-icons-png.flaticon.com/512/3480/3480521.png" alt="급식">
+        <h3>오늘의 급식</h3>
+        <p>오늘의 맛있는 급식 메뉴를 확인하세요.</p>
+      </div>
+      <div class="menu-card" onclick="alert('성적조회 페이지로 이동 예정!')">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="성적조회">
+        <h3>성적조회</h3>
+        <p>중간·기말 성적 및 누적 성적을 확인합니다.</p>
+      </div>
+      <div class="menu-card" onclick="alert('시간표 페이지로 이동 예정!')">
+        <img src="https://cdn-icons-png.flaticon.com/512/1688/1688450.png" alt="시간표">
+        <h3>시간표</h3>
+        <p>나의 오늘 수업과 과목을 한눈에 확인하세요.</p>
+      </div>
+    </section>
+
+    <footer>
+      © 2025 창원성민여자고등학교 | CODE PROJECT :: WHALE
+    </footer>
+  </div>
+
+  <script>
+    // 임시 계정 데이터
+    const students = [];
+    for (let g = 1; g <= 3; g++) {
+      for (let c = 1; c <= 7; c++) {
+        for (let n = 1; n <= 28; n++) {
+          const id = `${g}${String(c).padStart(2, "0")}${String(n).padStart(2, "0")}`;
+          students.push({ id, pw: "1234" });
+        }
+      }
+    }
+
+    function login() {
+      const id = document.getElementById("studentId").value.trim();
+      const pw = document.getElementById("studentPw").value.trim();
+
+      if (!id || !pw) return alert("아이디와 비밀번호를 모두 입력하세요.");
+
+      const student = students.find(s => s.id === id && s.pw === pw);
+      if (!student) {
+        alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+        return;
+      }
+
+      localStorage.setItem("currentStudent", JSON.stringify(student));
+      showMain();
+    }
+
+    function showMain() {
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("mainPage").style.display = "block";
+    }
+
+    function logout() {
+      localStorage.removeItem("currentStudent");
+      document.getElementById("mainPage").style.display = "none";
+      document.getElementById("loginPage").style.display = "flex";
+    }
+
+    window.onload = () => {
+      const saved = localStorage.getItem("currentStudent");
+      if (saved) showMain();
+    };
+  </script>
+</body>
+</html>
