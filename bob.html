@@ -185,75 +185,126 @@
   </script>
 </body>
 </html>
+
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>학생 성적 관리</title>
+  <meta charset="UTF-8">
+  <title>학생 성적 조회 시스템</title>
   <style>
-    body { font-family: Pretendard, sans-serif; background: #fafafa; padding: 30px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    th { background-color: #2b6cb0; color: white; }
-    input { width: 80px; text-align: center; }
-    .grade { font-weight: bold; }
+    body {
+      font-family: Pretendard, sans-serif;
+      background: #f8fafc;
+      text-align: center;
+      padding: 50px;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 200px;
+      margin: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    table {
+      margin: 30px auto;
+      border-collapse: collapse;
+      width: 70%;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #1e3a8a;
+      color: white;
+    }
+    #result {
+      margin-top: 40px;
+      font-size: 18px;
+      color: #111827;
+    }
   </style>
 </head>
 <body>
-  <h2>🎓 학생 성적 관리 시스템</h2>
-  <table id="scoreTable">
-    <tr>
-      <th>과목</th>
-      <th>점수</th>
-      <th>등급</th>
-    </tr>
-    <tr>
-      <td>국어</td>
-      <td><input type="number" id="korean" /></td>
-      <td id="gradeKorean" class="grade">-</td>
-    </tr>
-    <tr>
-      <td>수학</td>
-      <td><input type="number" id="math" /></td>
-      <td id="gradeMath" class="grade">-</td>
-    </tr>
-    <tr>
-      <td>영어</td>
-      <td><input type="number" id="english" /></td>
-      <td id="gradeEnglish" class="grade">-</td>
-    </tr>
-  </table>
 
-  <h3>📊 평균 점수: <span id="avg">0</span></h3>
+  <h2>🎓 학생 성적 조회 시스템</h2>
+  <p>자신의 학번을 입력하세요.</p>
+  <input type="text" id="studentId" placeholder="예: 20250101">
+  <button onclick="searchStudent()">조회</button>
+
+  <div id="result"></div>
 
   <script>
-    const subjects = ["korean", "math", "english"];
+    // -------------------------------
+    // ✅ 학생 데이터베이스 (예시)
+    // -------------------------------
+    const students = {
+      "20250101": { name: "김민수", scores: { 국어: 87, 수학: 91, 영어: 78, 사회: 84, 과학: 90 } },
+      "20250102": { name: "박지은", scores: { 국어: 92, 수학: 95, 영어: 89, 사회: 85, 과학: 88 } },
+      "20250103": { name: "이준호", scores: { 국어: 73, 수학: 68, 영어: 75, 사회: 80, 과학: 70 } },
+      "20250104": { name: "정하늘", scores: { 국어: 55, 수학: 61, 영어: 59, 사회: 63, 과학: 57 } }
+    };
 
+    // -------------------------------
+    // ✅ 등급 계산 함수 (1~9등급)
+    // -------------------------------
     function getGrade(score) {
-      if (score >= 90) return "A";
-      if (score >= 80) return "B";
-      if (score >= 70) return "C";
-      if (score >= 60) return "D";
-      return "F";
+      if (score >= 96) return 1;
+      if (score >= 90) return 2;
+      if (score >= 84) return 3;
+      if (score >= 78) return 4;
+      if (score >= 70) return 5;
+      if (score >= 60) return 6;
+      if (score >= 50) return 7;
+      if (score >= 40) return 8;
+      return 9;
     }
 
-    subjects.forEach(sub => {
-      document.getElementById(sub).addEventListener("input", updateScores);
-    });
+    // -------------------------------
+    // ✅ 조회 함수
+    // -------------------------------
+    function searchStudent() {
+      const id = document.getElementById("studentId").value.trim();
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "";
 
-    function updateScores() {
-      let total = 0, count = 0;
-      subjects.forEach(sub => {
-        const val = Number(document.getElementById(sub).value);
-        if (!isNaN(val) && val !== 0) {
-          total += val;
-          count++;
-          document.getElementById(`grade${sub.charAt(0).toUpperCase()+sub.slice(1)}`).innerText = getGrade(val);
-        }
-      });
-      const avg = count ? (total / count).toFixed(1) : 0;
-      document.getElementById("avg").innerText = avg;
+      if (!students[id]) {
+        resultDiv.innerHTML = `<p style="color:red;">❌ 해당 학번을 찾을 수 없습니다.</p>`;
+        return;
+      }
+
+      const student = students[id];
+      const scores = student.scores;
+
+      let tableHTML = `
+        <h3>📋 ${student.name} 학생 성적</h3>
+        <table>
+          <tr><th>과목</th><th>점수</th><th>등급</th></tr>
+      `;
+
+      for (const subject in scores) {
+        const score = scores[subject];
+        const grade = getGrade(score);
+        tableHTML += `<tr><td>${subject}</td><td>${score}</td><td>${grade}</td></tr>`;
+      }
+
+      tableHTML += `</table>`;
+      resultDiv.innerHTML = tableHTML;
     }
   </script>
+
 </body>
 </html>
